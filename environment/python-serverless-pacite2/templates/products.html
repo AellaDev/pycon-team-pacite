@@ -31,6 +31,7 @@
             padding: 20px;
         }
     </style>
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.814.0.min.js"></script>
 </head>
 <body>
     <h1>with love, APC - Product List</h1>
@@ -52,14 +53,29 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const products = [
-                { "product_id": "P0934", "price": 335.21, "product_name": "Doe Cookies", "quantity": 10 },
-                { "product_id": "P3242", "price": 25.22, "product_name": "Lua Candies", "quantity": 25 }
-            ];
-            
+            AWS.config.update({
+                region: 'us-east-2',
+                accessKeyId: '${env:AWS_ACCESS_KEY_ID}',
+                secretAccessKey: '${env:AWS_SECRET_ACCESS_KEY}'
+            });
+
+            const docClient = new AWS.DynamoDB.DocumentClient();
+            const tableName = 'products-pacite2'; // Replace with your DynamoDB table name
+
             function fetchProducts() {
-                return new Promise((resolve) => {
-                    setTimeout(() => resolve(products), 500);
+                const params = {
+                    TableName: tableName
+                };
+
+                return new Promise((resolve, reject) => {
+                    docClient.scan(params, function(err, data) {
+                        if (err) {
+                            console.error("Unable to scan the table. Error JSON:", JSON.stringify(err, null, 2));
+                            reject(err);
+                        } else {
+                            resolve(data.Items);
+                        }
+                    });
                 });
             }
 
@@ -71,7 +87,7 @@
                     tableBody.innerHTML = '<tr><td colspan="4" class="loading">No products found</td></tr>';
                     return;
                 }
-                
+
                 products.forEach(product => {
                     const row = document.createElement('tr');
                     row.innerHTML = `

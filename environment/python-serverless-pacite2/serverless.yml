@@ -45,13 +45,6 @@ functions:
           path: /products-pacite2/purchase
           method: post
 
-  receiveMessagesFromSqs:
-    handler: handlers/receive_sqs.handler
-    events:
-      - httpApi:
-          path: /products-pacite2/sqs
-          method: post
-
 package:
   individually: true
   patterns:

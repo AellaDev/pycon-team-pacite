@@ -228,6 +228,8 @@
             font-size: 24px;
         }
     </style>
+    <script src='//eu.fw-cdn.com/13052488/1004008.js' chat='true'></script>
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.814.0.min.js"></script>
 </head>
 <body>
     <div class="topbar">
@@ -264,48 +266,52 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            
-            const products = [
-                {
-                    "product_id": "P0934",
-                    "price": 335.21,
-                    "product_name": "Doe Cookies",
-                    "quantity": 10
-                },
-                {
-                    "product_id": "P3242",
-                    "price": 25.22,
-                    "product_name": "Lua Candies", 
-                    "quantity": 25
-                }
-            ];
-            
-            // In a real implementation, you would fetch from your API
+            AWS.config.update({
+                region: 'us-east-2', // e.g., 'us-west-2'
+                accessKeyId: '${env:AWS_ACCESS_KEY_ID}',
+                secretAccessKey: '${env:AWS_SECRET_ACCESS_KEY}'
+            });
+
+            const docClient = new AWS.DynamoDB.DocumentClient();
+            const tableName = 'products-pacite2'; // Replace with your DynamoDB table name
+
             function fetchProducts() {
-                // This would be replaced with your actual API call
-                return new Promise((resolve) => {
-                    setTimeout(() => resolve(products), 500); // Simulate API delay
+                const params = {
+                    TableName: tableName
+                };
+
+                return new Promise((resolve, reject) => {
+                    docClient.scan(params, function(err, data) {
+                        if (err) {
+                            console.error("Unable to scan the table. Error JSON:", JSON.stringify(err, null, 2));
+                            reject(err);
+                        } else {
+                            resolve(data.Items);
+                        }
+                    });
                 });
             }
-            
-            // Render products in the grid
+
             function renderProducts(products) {
                 const container = document.getElementById('products-grid');
                 container.innerHTML = ''; // Clear loading message
-                
+
                 if (products.length === 0) {
                     container.innerHTML = '<div class="loading">No products found</div>';
                     return;
                 }
-                
+
                 products.forEach(product => {
                     const productCard = document.createElement('div');
                     productCard.className = 'product-card';
-                    
+
                     const isOutOfStock = product.quantity <= 0;
-                    
+
+                    // Use static folder paths for the images
+                    const imageUrl = product.product_id === 'P0934' ? '/static/Doe_Cookies.jpg' : '/static/Lua_Candies.jpg';
+
                     productCard.innerHTML = `
-                        <img src="/api/placeholder/220/180" class="product-img" alt="${product.product_name}">
+                        <img src="${imageUrl}" class="product-img" alt="${product.product_name}">
                         <div class="product-id">${product.product_id}</div>
                         <h3 class="product-title">${product.product_name}</h3>
                         <div class="price-display">$${product.price.toFixed(2)}</div>
@@ -313,23 +319,23 @@
                         ${isOutOfStock ? '<div class="out-of-stock">OUT OF STOCK</div>' : ''}
                         <button class="add-btn" ${isOutOfStock ? 'disabled' : ''}>Add to Cart</button>
                     `;
-                    
+
                     container.appendChild(productCard);
                 });
             }
-            
+
             // Initialize the page
             fetchProducts().then(renderProducts);
-            
+
             // Setup cart functionality (simplified)
             let cartItems = 0;
             const cartCount = document.querySelector('.cart-count');
-            
+
             document.addEventListener('click', function(e) {
                 if (e.target && e.target.classList.contains('add-btn') && !e.target.disabled) {
                     cartItems++;
                     cartCount.textContent = cartItems;
-                    
+
                     // Give visual feedback
                     e.target.textContent = "Added!";
                     setTimeout(() => {
@@ -337,23 +343,25 @@
                     }, 1000);
                 }
             });
-            
+
             // Search functionality
             const searchBox = document.querySelector('.search-box');
             searchBox.addEventListener('input', function(e) {
                 const searchTerm = e.target.value.toLowerCase();
-                
+
                 if (searchTerm.trim() === '') {
-                    renderProducts(products);
+                    fetchProducts().then(renderProducts);
                     return;
                 }
-                
-                const filteredProducts = products.filter(product => 
-                    product.product_name.toLowerCase().includes(searchTerm) || 
-                    product.product_id.toLowerCase().includes(searchTerm)
-                );
-                
-                renderProducts(filteredProducts);
+
+                fetchProducts().then(products => {
+                    const filteredProducts = products.filter(product =>
+                        product.product_name.toLowerCase().includes(searchTerm) ||
+                        product.product_id.toLowerCase().includes(searchTerm)
+                    );
+
+                    renderProducts(filteredProducts);
+                });
             });
         });
     </script>
