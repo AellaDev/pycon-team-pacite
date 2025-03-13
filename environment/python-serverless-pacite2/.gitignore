@@ -1,0 +1,14 @@
+.env
+*.secrets
+
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+
+.serverless/
+package-lock.json
+node_modules/
+
+*.log
+aws-exports.js

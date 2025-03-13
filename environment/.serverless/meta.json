@@ -1,0 +1,142 @@
+{
+  "unknown": {
+    "versionFramework": "4.7.0",
+    "command": [],
+    "options": {},
+    "serviceProviderAwsCfStackId": null,
+    "serviceProviderAwsCfStackCreated": null,
+    "serviceProviderAwsCfStackUpdated": null,
+    "serviceProviderAwsCfStackStatus": null,
+    "serviceProviderAwsCfStackOutputs": null
+  },
+  "/home/ec2-user/environment/serverless.yml": {
+    "versionFramework": "4.7.0",
+    "servicePath": "/home/ec2-user/environment/serverless.yml",
+    "serviceConfigFileName": "serverless.yml",
+    "service": {
+      "org": "arabella",
+      "service": "python-serverless-pacite2",
+      "provider": {
+        "name": "aws",
+        "runtime": "python3.12",
+        "role": "arn:aws:iam::874957933250:role/serverless-app-role",
+        "region": "us-east-2",
+        "environment": {
+          "PRODUCTS_TABLE": "products-pacite",
+          "PRODUCTS_QUEUE": "products-queue-pacite-sqs",
+          "PRODUCTS_BUCKET": "products-bucket-pacite1"
+        },
+        "stage": "dev",
+        "versionFunctions": true
+      },
+      "functions": {
+        "hello": {
+          "handler": "handler.hello",
+          "events": [
+            {
+              "httpApi": {
+                "path": "/",
+                "method": "get"
+              }
+            }
+          ]
+        },
+        "getAllProducts": {
+          "handler": "handler.get_all_products",
+          "events": [
+            {
+              "httpApi": {
+                "path": "/products-pacite",
+                "method": "get"
+              }
+            }
+          ]
+        },
+        "createOneProduct": {
+          "handler": "handler.create_one_product",
+          "events": [
+            {
+              "httpApi": {
+                "path": "/products-pacite",
+                "method": "post"
+              }
+            }
+          ]
+        },
+        "batchCreateProducts": {
+          "handler": "handler.batch_create_products",
+          "events": [
+            {
+              "s3": {
+                "bucket": "products-bucket-pacite1",
+                "event": "s3:ObjectCreated:*",
+                "existing": true
+              }
+            }
+          ]
+        },
+        "receiveMessagesFromSqs": {
+          "handler": "handler.receive_message_from_sqs",
+          "events": [
+            {
+              "sqs": "arn:aws:sqs:us-east-2:272898481162:products-sqs-pacite2"
+            }
+          ]
+        }
+      },
+      "plugins": [
+        "serverless-python-requirements"
+      ],
+      "package": {
+        "patterns": [
+          "!node_modules/**",
+          "!.venv/**",
+          "!.env"
+        ]
+      }
+    },
+    "provider": {
+      "name": "aws",
+      "runtime": "python3.12",
+      "role": "arn:aws:iam::874957933250:role/serverless-app-role",
+      "region": "us-east-2",
+      "environment": {
+        "PRODUCTS_TABLE": "products-pacite",
+        "PRODUCTS_QUEUE": "products-queue-pacite-sqs",
+        "PRODUCTS_BUCKET": "products-bucket-pacite1"
+      },
+      "stage": "dev",
+      "versionFunctions": true
+    },
+    "dashboard": {
+      "isEnabledForService": false,
+      "requiredAuthentication": false,
+      "orgFeaturesInUse": null,
+      "orgObservabilityIntegrations": null,
+      "serviceAppId": null,
+      "serviceProvider": null,
+      "instanceParameters": null
+    },
+    "error": {
+      "message": "Serverless plugin \"serverless-python-requirements\" not found. Make sure it's installed and listed in the \"plugins\" section of your serverless config file. Use the --debug flag to learn more.",
+      "stack": "ServerlessError3: Serverless plugin \"serverless-python-requirements\" not found. Make sure it's installed and listed in the \"plugins\" section of your serverless config file. Use the --debug flag to learn more.\n    at PluginManager.resolveServicePlugins (file:///home/ec2-user/.serverless/releases/4.7.0/package/dist/sf-core.js:1433:2917)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async PluginManager.loadAllPlugins (file:///home/ec2-user/.serverless/releases/4.7.0/package/dist/sf-core.js:1433:1293)\n    at async Serverless.init (file:///home/ec2-user/.serverless/releases/4.7.0/package/dist/sf-core.js:1440:9893)\n    at async runFramework (file:///home/ec2-user/.serverless/releases/4.7.0/package/dist/sf-core.js:1467:838)\n    at async TraditionalRunner.run (file:///home/ec2-user/.serverless/releases/4.7.0/package/dist/sf-core.js:1463:28364)\n    at async route (file:///home/ec2-user/.serverless/releases/4.7.0/package/dist/sf-core.js:1509:2779)\n    at async Object.run (file:///home/ec2-user/.serverless/releases/4.7.0/package/dist/sf-core.js:1510:3668)\n    at async run2 (file:///home/ec2-user/.serverless/releases/4.7.0/package/dist/sf-core.js:1510:4821)",
+      "code": "PLUGIN_NOT_FOUND"
+    },
+    "serviceRawFile": "org: arabella\nservice: python-serverless-pacite2\n\nprovider:\n  name: aws\n  runtime: python3.12\n  role: arn:aws:iam::874957933250:role/serverless-app-role\n  region: us-east-2\n  environment:\n    PRODUCTS_TABLE: products-pacite\n    PRODUCTS_QUEUE: products-queue-pacite-sqs\n    PRODUCTS_BUCKET: products-bucket-pacite1\n\nfunctions:\n  hello:\n    handler: handler.hello\n    events:\n      - httpApi:\n          path: /\n          method: get\n  getAllProducts:\n    handler: handler.get_all_products\n    events:\n      - httpApi:\n          path: /products-pacite\n          method: get\n  createOneProduct:\n    handler: handler.create_one_product\n    events:\n      - httpApi:\n          path: /products-pacite\n          method: post\n  batchCreateProducts:\n    handler: handler.batch_create_products\n    events:\n      - s3:\n          bucket: ${self:provider.environment.PRODUCTS_BUCKET}\n          event: s3:ObjectCreated:*\n          existing: true\n  receiveMessagesFromSqs:\n    handler: handler.receive_message_from_sqs\n    events:\n      - sqs: arn:aws:sqs:us-east-2:272898481162:products-sqs-pacite2\n\nplugins:\n  - serverless-python-requirements\n\npackage:\n  patterns:\n    - '!node_modules/**'\n    - '!.venv/**'\n    - '!.env'",
+    "command": [
+      "deploy"
+    ],
+    "options": {
+      "region": "us-east-2"
+    },
+    "orgId": "a616dd99-dda9-4ff9-ae55-79ce03d813ba",
+    "orgName": "arabella",
+    "userId": null,
+    "serviceProviderAwsAccountId": "272898481162",
+    "serviceProviderAwsCfStackId": null,
+    "serviceProviderAwsCfStackCreated": null,
+    "serviceProviderAwsCfStackUpdated": null,
+    "serviceProviderAwsCfStackStatus": null,
+    "serviceProviderAwsCfStackOutputs": null
+  }
+}

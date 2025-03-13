@@ -1,0 +1,63 @@
+# "org" ensures this Service is used with the correct Serverless Framework License Key.
+org: arabella
+
+# "service" is the name of this project. This will also be added to your AWS resource names.
+service: python-serverless-pacite2
+
+provider:
+  name: aws
+  runtime: python3.12
+  role: ${env:AWS_ROLE}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:*
+      Resource: ${env:DYNAMODB_ARN}
+    - Effect: Allow
+      Action:
+        - s3:*
+      Resource: ${env:S3_ARN}
+    - Effect: Allow
+      Action:
+        - sqs:*
+      Resource: ${env:SQS_ARN}
+
+functions:
+
+  getAllProducts:
+    handler: handlers/get_all.handler
+    events:
+      - httpApi:
+          path: /products-pacite2
+          method: get
+
+  getOneProduct:
+    handler: handlers/get_one.handler
+    events:
+      - httpApi:
+          path: /products-pacite2/getone
+          method: get
+          
+  customerPurchase:
+    handler: handlers/customer_purchase.handler
+    events:
+      - httpApi:
+          path: /products-pacite2/purchase
+          method: post
+
+  receiveMessagesFromSqs:
+    handler: handlers/receive_sqs.handler
+    events:
+      - httpApi:
+          path: /products-pacite2/sqs
+          method: post
+
+package:
+  individually: true
+  patterns:
+    - "!node_modules/**"
+    - "!__pycache__/**"
+    - "handlers/**"
+    - "models/**"
+    - "gateways/**"
+    - "utils/**"
