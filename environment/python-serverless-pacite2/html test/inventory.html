@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #fcf4dd;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            padding: 20px;
+            background: white;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #ddd;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .active {
+            border-bottom: 3px solid #e8dff5;
+        }
+        .search {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #ddedea;
+        }
+        .status {
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        .in-stock {
+            background-color: #ddedea;
+        }
+        .out-stock {
+            background-color: #fce1e4;
+        }
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .btn-create {
+            background-color: #daeaf6;
+        }
+        .btn-delete {
+            background-color: #fce1e4;
+        }
+        .pagination {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .pagination span {
+            margin: 0 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Manage Inventory</h1>
+        <div class="tabs">
+            <div class="tab active">Inventory Management</div>
+            <div class="tab">Return Management</div>
+        </div>
+        <input type="text" class="search" placeholder="Search by product name">
+        <button class="btn btn-create">Create</button>
+        <button class="btn btn-delete">Delete</button>
+        <table>
+            <thead>
+                <tr>
+                    <th>Product ID</th>
+                    <th>Product Name</th>
+                    <th>Price</th>
+                    <th>Inventory</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>001</td>
+                    <td>Coffee Beans</td>
+                    <td>$14.00</td>
+                    <td>100</td>
+                    <td><span class="status in-stock">In Stock</span></td>
+                    <td><button class="btn">Edit</button></td>
+                </tr>
+                <tr>
+                    <td>002</td>
+                    <td>Coffee Grinder</td>
+                    <td>$28.00</td>
+                    <td>50</td>
+                    <td><span class="status out-stock">Out of Stock</span></td>
+                    <td><button class="btn">Edit</button></td>
+                </tr>
+                <tr>
+                    <td>003</td>
+                    <td>Coffee Mug</td>
+                    <td>$10.00</td>
+                    <td>150</td>
+                    <td><span class="status in-stock">In Stock</span></td>
+                    <td><button class="btn">Edit</button></td>
+                </tr>
+                <tr>
+                    <td>004</td>
+                    <td>Espresso Machine</td>
+                    <td>$200.00</td>
+                    <td>10</td>
+                    <td><span class="status in-stock">In Stock</span></td>
+                    <td><button class="btn">Edit</button></td>
+                </tr>
+                <tr>
+                    <td>005</td>
+                    <td>Tea Leaves</td>
+                    <td>$12.00</td>
+                    <td>75</td>
+                    <td><span class="status out-stock">Out of Stock</span></td>
+                    <td><button class="btn">Edit</button></td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="pagination">
+            <span>&lt;</span>
+            <span class="active">1</span>
+            <span>2</span>
+            <span>3</span>
+            <span>&gt;</span>
+        </div>
+    </div>
+</body>
+</html>

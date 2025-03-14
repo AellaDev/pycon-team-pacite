@@ -6,14 +6,14 @@
     <title>with love, APC - Your Gentle Shopping Experience</title>
     <style>
         :root {
-            --pastel-pink: #f8c8dc;
-            --pastel-purple: #e0c3fc;
-            --pastel-blue: #c5e0fa;
-            --pastel-darker-blue: #9ec3eb;
-            --pastel-darker-pink: #e6a6c4;
+            --pastel-pink: #e6b8bc;
+            --pastel-purple: #c8b0d8;
+            --pastel-blue: #b0c4de;
+            --pastel-darker-blue: #a0c0c0;
+            --pastel-darker-pink: #e6b8bc;
             --text-color: #4a4a4a;
             --white: #ffffff;
-            --light-gray: #f5f5f5;
+            --light-gray: #dcdcdc;
             --rating-star: #ffce00;
         }
         
@@ -42,14 +42,20 @@
             align-items: center;
         }
         
-        .dropdown button {
+        .dropdown {
+            display: none; /* Hide the dropdown */
+        }
+        
+        .auth-links button {
             background-color: var(--pastel-pink);
             border: none;
-            color: var(--text-color);
+            color: #666666; /* Lighter shade for text */
             padding: 8px 16px;
             border-radius: 4px;
             cursor: pointer;
             font-weight: bold;
+            margin-left: 10px;
+            margin-right: 10px; /* Add margin to the right */
         }
         
         .search-container {
@@ -75,6 +81,20 @@
             border-radius: 4px;
             margin-right: 20px;
             position: relative;
+            display: flex;
+            align-items: center;
+            margin-left: 10px; /* Add margin to the left */
+        }
+        
+        .cart-container i {
+            margin-right: 5px;
+        }
+        
+        .cart-container span {
+            font-weight: bold;
+            color: #666666; /* Lighter shade for text */
+            display: flex;
+            align-items: center;
         }
         
         .cart-count {
@@ -227,6 +247,30 @@
             color: var(--pastel-purple);
             font-size: 24px;
         }
+
+        .quantity-counter {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .quantity-counter button {
+            background-color: var(--pastel-purple);
+            color: var(--white);
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .quantity-counter input {
+            width: 40px;
+            text-align: center;
+            border: 1px solid var(--light-gray);
+            border-radius: 4px;
+            margin: 0 5px;
+        }
     </style>
     <script src='//eu.fw-cdn.com/13052488/1004008.js' chat='true'></script>
 </head>
@@ -239,11 +283,11 @@
             <input type="text" class="search-box" placeholder="Search...">
         </div>
         <div class="auth-links">
-            <a href="#">Sign In</a> | 
-            <a href="#">Create an Account</a>
+            <button>Sign In</button>
+            <button>Create an Account</button>
         </div>
         <div class="cart-container">
-            <i class="fas fa-shopping-cart"></i> <span class="cart-count">0</span>
+            <span>🛒 <span class="cart-count">0</span></span>
         </div>
     </div>
     
@@ -294,16 +338,20 @@
 
                     const isOutOfStock = product.quantity <= 0;
 
-                    // Use static folder paths for the images
-                    const imageUrl = product.product_id === 'P0934' ? '/static/Doe_Cookies.jpg' : '/static/Lua_Candies.jpg';
+                    const imageUrl = `/static/${product.product_name.replace(/ /g, '_')}.jpg`;
 
                     productCard.innerHTML = `
                         <img src="${imageUrl}" class="product-img" alt="${product.product_name}">
                         <div class="product-id">${product.product_id}</div>
                         <h3 class="product-title">${product.product_name}</h3>
-                        <div class="price-display">$${(Number(product.price)).toFixed(2)}</div>
+                        <div class="price-display">₱${(Number(product.price)).toFixed(2)}</div>
                         <div class="quantity-display">In stock: ${product.quantity}</div>
                         ${isOutOfStock ? '<div class="out-of-stock">OUT OF STOCK</div>' : ''}
+                        <div class="quantity-counter">
+                            <button class="decrease-btn">-</button>
+                            <input type="number" class="quantity-input" value="1" min="1" max="${product.quantity}">
+                            <button class="increase-btn">+</button>
+                        </div>
                         <button class="add-btn" ${isOutOfStock ? 'disabled' : ''}>Add to Cart</button>
                     `;
 
@@ -320,7 +368,9 @@
 
             document.addEventListener('click', function(e) {
                 if (e.target && e.target.classList.contains('add-btn') && !e.target.disabled) {
-                    cartItems++;
+                    const quantityInput = e.target.previousElementSibling.querySelector('.quantity-input');
+                    const quantity = parseInt(quantityInput.value, 10);
+                    cartItems += quantity;
                     cartCount.textContent = cartItems;
 
                     // Give visual feedback
@@ -328,6 +378,20 @@
                     setTimeout(() => {
                         e.target.textContent = "Add to Cart";
                     }, 1000);
+                }
+
+                if (e.target && e.target.classList.contains('decrease-btn')) {
+                    const quantityInput = e.target.nextElementSibling;
+                    if (quantityInput.value > 1) {
+                        quantityInput.value--;
+                    }
+                }
+
+                if (e.target && e.target.classList.contains('increase-btn')) {
+                    const quantityInput = e.target.previousElementSibling;
+                    if (quantityInput.value < Math.min(quantityInput.max, 10)) {
+                        quantityInput.value++;
+                    }
                 }
             });
 
