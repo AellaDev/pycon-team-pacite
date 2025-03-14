@@ -31,7 +31,6 @@
             padding: 20px;
         }
     </style>
-    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.814.0.min.js"></script>
 </head>
 <body>
     <h1>with love, APC - Product List</h1>
@@ -53,30 +52,18 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            AWS.config.update({
-                region: 'us-east-2',
-                accessKeyId: '${env:AWS_ACCESS_KEY_ID}',
-                secretAccessKey: '${env:AWS_SECRET_ACCESS_KEY}'
-            });
-
-            const docClient = new AWS.DynamoDB.DocumentClient();
-            const tableName = 'products-pacite2'; // Replace with your DynamoDB table name
-
             function fetchProducts() {
-                const params = {
-                    TableName: tableName
-                };
-
-                return new Promise((resolve, reject) => {
-                    docClient.scan(params, function(err, data) {
-                        if (err) {
-                            console.error("Unable to scan the table. Error JSON:", JSON.stringify(err, null, 2));
-                            reject(err);
-                        } else {
-                            resolve(data.Items);
+                return fetch('/api/products')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
                         }
+                        return response.json();
+                    })
+                    .catch(error => {
+                        console.error("Error fetching products:", error);
+                        return [];
                     });
-                });
             }
 
             function renderProducts(products) {
@@ -93,7 +80,7 @@
                     row.innerHTML = `
                         <td>${product.product_id}</td>
                         <td>${product.product_name}</td>
-                        <td>$${product.price.toFixed(2)}</td>
+                        <td>$${(Number(product.price)).toFixed(2)}</td>
                         <td>${product.quantity}</td>
                     `;
                     tableBody.appendChild(row);

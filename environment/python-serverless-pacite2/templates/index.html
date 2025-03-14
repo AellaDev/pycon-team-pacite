@@ -229,7 +229,6 @@
         }
     </style>
     <script src='//eu.fw-cdn.com/13052488/1004008.js' chat='true'></script>
-    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.814.0.min.js"></script>
 </head>
 <body>
     <div class="topbar">
@@ -266,30 +265,18 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            AWS.config.update({
-                region: 'us-east-2', // e.g., 'us-west-2'
-                accessKeyId: '${env:AWS_ACCESS_KEY_ID}',
-                secretAccessKey: '${env:AWS_SECRET_ACCESS_KEY}'
-            });
-
-            const docClient = new AWS.DynamoDB.DocumentClient();
-            const tableName = 'products-pacite2'; // Replace with your DynamoDB table name
-
             function fetchProducts() {
-                const params = {
-                    TableName: tableName
-                };
-
-                return new Promise((resolve, reject) => {
-                    docClient.scan(params, function(err, data) {
-                        if (err) {
-                            console.error("Unable to scan the table. Error JSON:", JSON.stringify(err, null, 2));
-                            reject(err);
-                        } else {
-                            resolve(data.Items);
+                return fetch('/api/products')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
                         }
+                        return response.json();
+                    })
+                    .catch(error => {
+                        console.error("Error fetching products:", error);
+                        return [];
                     });
-                });
             }
 
             function renderProducts(products) {
@@ -314,7 +301,7 @@
                         <img src="${imageUrl}" class="product-img" alt="${product.product_name}">
                         <div class="product-id">${product.product_id}</div>
                         <h3 class="product-title">${product.product_name}</h3>
-                        <div class="price-display">$${product.price.toFixed(2)}</div>
+                        <div class="price-display">$${(Number(product.price)).toFixed(2)}</div>
                         <div class="quantity-display">In stock: ${product.quantity}</div>
                         ${isOutOfStock ? '<div class="out-of-stock">OUT OF STOCK</div>' : ''}
                         <button class="add-btn" ${isOutOfStock ? 'disabled' : ''}>Add to Cart</button>
@@ -349,12 +336,12 @@
             searchBox.addEventListener('input', function(e) {
                 const searchTerm = e.target.value.toLowerCase();
 
-                if (searchTerm.trim() === '') {
-                    fetchProducts().then(renderProducts);
-                    return;
-                }
-
                 fetchProducts().then(products => {
+                    if (searchTerm.trim() === '') {
+                        renderProducts(products);
+                        return;
+                    }
+
                     const filteredProducts = products.filter(product =>
                         product.product_name.toLowerCase().includes(searchTerm) ||
                         product.product_id.toLowerCase().includes(searchTerm)
