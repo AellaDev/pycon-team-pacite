@@ -363,15 +363,28 @@
             fetchProducts().then(renderProducts);
 
             // Setup cart functionality (simplified)
-            let cartItems = 0;
+            let cartItems = {};
             const cartCount = document.querySelector('.cart-count');
 
             document.addEventListener('click', function(e) {
                 if (e.target && e.target.classList.contains('add-btn') && !e.target.disabled) {
+                    const productCard = e.target.closest('.product-card');
+                    const productId = productCard.querySelector('.product-id').textContent;
                     const quantityInput = e.target.previousElementSibling.querySelector('.quantity-input');
                     const quantity = parseInt(quantityInput.value, 10);
-                    cartItems += quantity;
-                    cartCount.textContent = cartItems;
+                    const maxQuantity = parseInt(quantityInput.max, 10);
+
+                    if (!cartItems[productId]) {
+                        cartItems[productId] = 0;
+                    }
+
+                    if (cartItems[productId] + quantity > maxQuantity) {
+                        alert(`Cannot add more than ${maxQuantity} items for this product.`);
+                        return;
+                    }
+
+                    cartItems[productId] += quantity;
+                    cartCount.textContent = Object.values(cartItems).reduce((a, b) => a + b, 0);
 
                     // Give visual feedback
                     e.target.textContent = "Added!";
@@ -391,6 +404,15 @@
                     const quantityInput = e.target.previousElementSibling;
                     if (quantityInput.value < Math.min(quantityInput.max, 10)) {
                         quantityInput.value++;
+                    }
+                }
+            });
+
+            document.addEventListener('input', function(e) {
+                if (e.target && e.target.classList.contains('quantity-input')) {
+                    const maxQuantity = parseInt(e.target.max, 10);
+                    if (parseInt(e.target.value, 10) > maxQuantity) {
+                        e.target.value = maxQuantity;
                     }
                 }
             });
